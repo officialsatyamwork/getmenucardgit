@@ -1,0 +1,110 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,500;1,9..144,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  /* Brand — matches the GetMenuCard logo */
+  --ink:          #1d1b19;
+  --ink-2:        #34302b;
+  --orange:       #f4831f;
+  --orange-deep:  #d9650b;
+  --orange-soft:  #fff1e3;
+  --orange-line:  #f8cfa6;
+  --leaf:         #4c9a2a;
+  --leaf-soft:    #ebf5e4;
+
+  /* Surfaces */
+  --bg:           #fbf7f1;
+  --bg-alt:       #f4ece1;
+  --bg-card:      #ffffff;
+  --border:       #ece3d6;
+  --border-dark:  #ddd0bd;
+
+  /* Legacy aliases used across pages */
+  --espresso:     var(--ink);
+  --brown:        var(--ink-2);
+  --gold:         #e8730f;
+  --gold-deep:    var(--orange-deep);
+  --gold-light:   #f6a25a;
+  --gold-dim:     rgba(244,131,31,0.10);
+  --gold-border:  rgba(244,131,31,0.30);
+
+  --text-1:       var(--ink);
+  --text-2:       #5a544c;
+  --text-3:       #8b8378;
+  --text-4:       #b8aea1;
+  --green:        #2f8a3a;
+  --red:          #d13b2a;
+
+  --shadow-sm:    0 1px 2px rgba(29,27,25,0.06), 0 1px 6px rgba(29,27,25,0.04);
+  --shadow-md:    0 6px 24px rgba(29,27,25,0.08), 0 1px 4px rgba(29,27,25,0.05);
+  --shadow-lg:    0 18px 50px rgba(29,27,25,0.12), 0 3px 10px rgba(29,27,25,0.06);
+  --r-sm: 8px; --r-md: 12px; --r-lg: 16px; --r-xl: 20px; --r-2xl: 28px;
+  --ease: all 0.22s cubic-bezier(0.4,0,0.2,1);
+
+  --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
+  --font-body:    'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text-1);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+h1,h2,h3,h4 { font-family: var(--font-display); font-weight: 600; letter-spacing: -0.02em; }
+button { font-family: var(--font-body); font-weight: 600; cursor: pointer; }
+input, textarea, select { font-family: var(--font-body); }
+nav, nav a { font-family: var(--font-body); font-weight: 500; }
+a { text-decoration: none; color: inherit; }
+::selection { background: var(--orange); color: #fff; }
+:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-dark); border-radius: 10px; }
+
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(18px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+@keyframes fadeIn  { from { opacity:0; } to { opacity:1; } }
+@keyframes slideUp {
+  from { opacity:0; transform:translateY(40px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+.au  { animation: fadeUp  0.6s cubic-bezier(0.2,0.7,0.2,1) both; }
+.ai  { animation: fadeIn  0.3s ease both; }
+.asu { animation: slideUp 0.38s cubic-bezier(0.4,0,0.2,1) both; }
+.d1  { animation-delay: 0.06s; }
+.d2  { animation-delay: 0.12s; }
+.d3  { animation-delay: 0.18s; }
+.d4  { animation-delay: 0.24s; }
+.d5  { animation-delay: 0.30s; }
+.d6  { animation-delay: 0.36s; }
+.d7  { animation-delay: 0.42s; }
+
+/* Prevent invisible flash on refresh */
+@media (prefers-reduced-motion: no-preference) {
+  .au, .ai, .asu { opacity: 0; }
+}
+
+/* Scroll reveal — toggled by useReveal() */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.7s cubic-bezier(0.2,0.7,0.2,1), transform 0.7s cubic-bezier(0.2,0.7,0.2,1);
+  transition-delay: var(--reveal-delay, 0s);
+}
+[data-reveal].is-visible { opacity: 1; transform: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.001s !important; animation-iteration-count: 1 !important; transition-duration: 0.001s !important; }
+  [data-reveal] { opacity: 1; transform: none; }
+}

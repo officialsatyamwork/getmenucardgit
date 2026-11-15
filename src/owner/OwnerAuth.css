@@ -1,0 +1,262 @@
+.oa-shell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  background: #f7f1e8;
+}
+
+.oa-hero {
+  position: relative;
+  overflow: hidden;
+  padding: 40px 48px;
+  color: #fff;
+  background:
+    radial-gradient(ellipse 80% 70% at 10% 20%, rgba(244, 131, 31, 0.35), transparent 55%),
+    linear-gradient(145deg, #1d1b19 0%, #2c241c 50%, #3d2a1a 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.oa-hero-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: none;
+  background: none;
+  padding: 0;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.oa-hero-brand:hover strong {
+  color: #f6a25a;
+}
+
+.oa-card-top {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 14px;
+}
+
+.oa-home-btn {
+  height: 34px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid #e2d8ca;
+  background: #fbf8f3;
+  color: #5a5248;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.oa-home-btn:hover {
+  border-color: #d9650b;
+  color: #d9650b;
+  background: #fff8f1;
+}
+
+.oa-hero-brand img {
+  height: 42px;
+  width: auto;
+}
+
+.oa-hero-brand strong {
+  display: block;
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+
+.oa-hero-brand span {
+  font-size: 0.78rem;
+  opacity: 0.7;
+  font-weight: 600;
+}
+
+.oa-hero-copy h2 {
+  font-family: var(--font-display, 'Fraunces', Georgia, serif);
+  font-size: clamp(2rem, 3.5vw, 2.8rem);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  max-width: 12ch;
+  margin: 0 0 16px;
+}
+
+.oa-hero-copy p {
+  max-width: 34ch;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 1rem;
+  line-height: 1.55;
+  margin: 0;
+}
+
+.oa-hero-meta {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.oa-hero-meta strong {
+  display: block;
+  font-size: 0.95rem;
+  margin-bottom: 4px;
+}
+
+.oa-hero-meta span {
+  font-size: 0.75rem;
+  opacity: 0.65;
+  font-weight: 600;
+}
+
+.oa-panel {
+  display: grid;
+  place-items: center;
+  padding: 40px 28px;
+}
+
+.oa-card {
+  width: min(100%, 420px);
+  background: #fff;
+  border: 1px solid #e8dccb;
+  border-radius: 20px;
+  padding: 36px 32px;
+  box-shadow: 0 18px 40px rgba(29, 27, 25, 0.08);
+}
+
+.oa-eyebrow {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #d9650b;
+  margin-bottom: 10px;
+}
+
+.oa-card h1 {
+  font-family: var(--font-display, 'Fraunces', Georgia, serif);
+  font-size: 1.85rem;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  margin: 0 0 8px;
+  color: #1d1b19;
+}
+
+.oa-lead {
+  margin: 0 0 24px;
+  color: #6b6358;
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.oa-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.oa-field label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #5a5248;
+  margin-bottom: 6px;
+}
+
+.oa-field input {
+  width: 100%;
+  height: 44px;
+  padding: 0 14px;
+  border-radius: 12px;
+  border: 1px solid #e2d8ca;
+  background: #fbf8f3;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #1d1b19;
+  outline: none;
+}
+
+.oa-field input:focus {
+  border-color: rgba(244, 131, 31, 0.55);
+  box-shadow: 0 0 0 3px rgba(244, 131, 31, 0.12);
+  background: #fff;
+}
+
+.oa-btn {
+  margin-top: 6px;
+  height: 46px;
+  border: none;
+  border-radius: 12px;
+  background: #1d1b19;
+  color: #fff;
+  font-size: 0.92rem;
+  font-weight: 700;
+  transition: background 0.15s, transform 0.15s;
+}
+
+.oa-btn:hover:not(:disabled) {
+  background: #d9650b;
+}
+
+.oa-btn:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+.oa-error {
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #fdecea;
+  border: 1px solid #f0c4bc;
+  color: #b42318;
+  font-size: 0.84rem;
+  font-weight: 600;
+}
+
+.oa-switch {
+  margin-top: 18px;
+  text-align: center;
+  font-size: 0.86rem;
+  color: #6b6358;
+  font-weight: 600;
+}
+
+.oa-switch button {
+  border: none;
+  background: none;
+  color: #d9650b;
+  font-weight: 800;
+  font-size: inherit;
+  padding: 0;
+  margin-left: 4px;
+}
+
+.oa-loading {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  color: #8b8378;
+  font-weight: 700;
+}
+
+@media (max-width: 900px) {
+  .oa-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .oa-hero {
+    min-height: 220px;
+    padding: 28px 24px;
+  }
+
+  .oa-hero-copy h2 {
+    max-width: none;
+    font-size: 1.7rem;
+  }
+
+  .oa-hero-meta {
+    display: none;
+  }
+}

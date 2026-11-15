@@ -1,0 +1,168 @@
+.rc {
+  --rc-accent: var(--orange);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.35s cubic-bezier(0.2,0.7,0.2,1), box-shadow 0.35s ease, border-color 0.35s ease;
+}
+.rc:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--border-dark);
+}
+
+.rc-media {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  margin: 10px 10px 0;
+  border-radius: 14px;
+  background: var(--bg-alt);
+}
+.rc-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.7s cubic-bezier(0.2,0.7,0.2,1);
+}
+.rc:hover .rc-img { transform: scale(1.06); }
+
+.rc-tag,
+.rc-scan {
+  position: absolute;
+  top: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 6px 11px;
+  border-radius: 999px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+.rc-tag {
+  left: 12px;
+  background: rgba(255,255,255,0.88);
+  color: var(--ink);
+}
+.rc-scan {
+  right: 12px;
+  background: rgba(29,27,25,0.72);
+  color: #fff;
+  opacity: 0;
+  transform: translateY(-6px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.rc:hover .rc-scan { opacity: 1; transform: none; }
+
+/* Ticket perforation */
+.rc-perf {
+  position: relative;
+  height: 22px;
+  margin: 0 18px;
+  background-image: linear-gradient(90deg, var(--border-dark) 50%, transparent 50%);
+  background-size: 10px 1.5px;
+  background-repeat: repeat-x;
+  background-position: center;
+}
+.rc-perf::before,
+.rc-perf::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--rc-notch, var(--bg));
+  border: 1px solid var(--border);
+  transform: translateY(-50%);
+}
+.rc-perf::before { left: -28px; }
+.rc-perf::after  { right: -28px; }
+
+.rc-body {
+  padding: 0 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+.rc-name {
+  font-family: var(--font-display);
+  font-size: 23px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  line-height: 1.15;
+}
+.rc-location {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-3);
+  margin-top: -2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.rc-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-3);
+}
+.rc-dot {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--text-4);
+}
+.rc-cats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 2px;
+}
+.rc-cats span {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-2);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 4px 10px;
+}
+.rc-foot {
+  margin-top: auto;
+  padding-top: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.rc-accent-bar {
+  width: 36px;
+  height: 4px;
+  border-radius: 4px;
+  background: var(--rc-accent);
+  transition: width 0.35s ease;
+}
+.rc:hover .rc-accent-bar { width: 64px; }
+.rc-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.rc-cta svg { transition: transform 0.25s ease; }
+.rc:hover .rc-cta svg { transform: translateX(4px); }
