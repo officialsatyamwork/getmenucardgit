@@ -41,6 +41,26 @@ const IconPin = ({ size = 14 }) => (
     <circle cx="12" cy="9" r="2.4" stroke="currentColor" strokeWidth="1.8"/>
   </svg>
 );
+const IconSun = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <circle cx="12" cy="12" r="4" stroke="currentColor" strokeWidth="1.8" />
+    <path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+  </svg>
+);
+const IconMoon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path d="M20 13.5A7.5 7.5 0 1110.5 4a6.2 6.2 0 009.5 9.5z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
+  </svg>
+);
+
+const THEME_KEY = 'mc_menu_theme';
+function readMenuTheme() {
+  try {
+    const t = localStorage.getItem(THEME_KEY);
+    if (t === 'dark' || t === 'light') return t;
+  } catch { /* ignore */ }
+  return 'light';
+}
 
 /* Indian FSSAI-style veg / non-veg mark */
 const VegMark = ({ tag, size = 14 }) => (
@@ -68,9 +88,18 @@ const SORTERS = {
 export default function MenuPage() {
   const { restaurantId } = useParams();
   const navigate = useNavigate();
+  const [theme, setTheme] = useState(readMenuTheme);
   const [accessTick, setAccessTick] = useState(0);
   const [restaurant, setRestaurant] = useState(null);
   const [loadState, setLoadState] = useState('loading'); // loading | ready | not_found | network
+
+  const toggleTheme = () => {
+    setTheme((prev) => {
+      const next = prev === 'dark' ? 'light' : 'dark';
+      try { localStorage.setItem(THEME_KEY, next); } catch { /* ignore */ }
+      return next;
+    });
+  };
   const access = useMemo(() => {
     if (restaurant) {
       return {
@@ -274,7 +303,7 @@ export default function MenuPage() {
     : [];
 
   return (
-    <div className="mp" style={{ '--accent': accent }}>
+    <div className={`mp${theme === 'dark' ? ' mp-theme-dark' : ''}`} style={{ '--accent': accent }}>
 
       {/* ── Header ── */}
       <header className="mp-header">
@@ -294,6 +323,15 @@ export default function MenuPage() {
                 <IconPin size={14} /> <span>Directions</span>
               </button>
             )}
+            <button
+              type="button"
+              className="mp-theme-btn"
+              onClick={toggleTheme}
+              aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+              title={theme === 'dark' ? 'Light mode' : 'Dark mode'}
+            >
+              {theme === 'dark' ? <IconSun /> : <IconMoon />}
+            </button>
             <button className="mp-review-btn" onClick={() => navigate(`/menu/${restaurantId}/review`)}>
               <IconStar size={13} /> <span>Rate us</span>
             </button>

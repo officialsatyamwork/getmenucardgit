@@ -117,7 +117,7 @@ export function RestaurantsPage({ restaurants, onOpenReport, onSetStatus, onRefr
   const hasFilters = query.trim() || statusFilter !== 'all' || planFilter !== 'all';
 
   return (
-    <div className="mp">
+    <div className="md">
       <div className="mp-banner">
         <div className="mp-banner-row">
           <div>
@@ -317,7 +317,7 @@ export function RestaurantDetailPage({ detail, onBack, onSetStatus, onRefresh, r
   const status = summary.status || restaurant.status || 'active';
 
   return (
-    <div className="mp">
+    <div className="md">
       <button type="button" className="md-link-btn mp-back" onClick={onBack}>
         ← Back to restaurants
       </button>
@@ -500,7 +500,7 @@ export function PresencePage({ activity, onRefresh, refreshing, onRemoveEvent, o
   };
 
   return (
-    <div className="mp">
+    <div className="md">
       <div className="mp-banner">
         <div className="mp-banner-row">
           <div>
@@ -637,7 +637,7 @@ export function ReportsPage({ reports, overview, onRefresh, refreshing }) {
   const weekReviews = daily.slice(-7).reduce((a, d) => a + d.reviews, 0);
 
   return (
-    <div className="mp">
+    <div className="md">
       <div className="mp-banner">
         <div className="mp-banner-row">
           <div>
@@ -756,7 +756,7 @@ export function ReportsPage({ reports, overview, onRefresh, refreshing }) {
 
 export function PlansPage({ subscriptions, plans, statuses, overview, onUpdate, onRefresh, refreshing }) {
   return (
-    <div className="mp">
+    <div className="md">
       <div className="mp-banner">
         <div className="mp-banner-row">
           <div>
@@ -839,7 +839,7 @@ export function ReviewsPage({ reviews, onRefresh, refreshing }) {
   const five = reviews.filter((r) => Number(r.rating) === 5).length;
 
   return (
-    <div className="mp">
+    <div className="md">
       <div className="mp-banner">
         <div className="mp-banner-row">
           <div>
