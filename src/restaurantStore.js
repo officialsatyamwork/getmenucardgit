@@ -10,12 +10,14 @@ import {
   fetchPublicReviews,
 } from './master/masterApi';
 import { getOwnerToken } from './owner/ownerApi';
+import sangeethaBanner from './assets/resturant/banner.jpg';
 
 const STORAGE_KEY = 'mc_published_restaurants';
 const VISIBILITY_KEY = 'mc_restaurant_visibility';
 const API_CACHE_KEY = 'mc_api_restaurants_cache';
 
 export const R_IMAGES = {
+  'sangeetha-kitchen': sangeethaBanner,
   'brew-and-bites': 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=600&q=80',
   'royal-bistro':   'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&q=80',
   'spice-house':    'https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=600&q=80',
@@ -136,8 +138,13 @@ export function getAllRestaurants({ includeHidden = false } = {}) {
     const info = getRestaurantStatusInfo(r.id);
     return { ...r, status: info.status || r.status || 'active', statusReason: info.reason || r.statusReason || '' };
   });
-  if (includeHidden) return list;
-  return list.filter((r) => (r.status || 'active') === 'active');
+  const visible = includeHidden ? list : list.filter((r) => (r.status || 'active') === 'active');
+  // Pin featured restaurant first in directory / home grids
+  return [...visible].sort((a, b) => {
+    if (a.id === 'sangeetha-kitchen') return -1;
+    if (b.id === 'sangeetha-kitchen') return 1;
+    return 0;
+  });
 }
 
 /** Load directory from API (falls back to local merge). */

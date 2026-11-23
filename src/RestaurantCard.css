@@ -3,6 +3,9 @@
   position: relative;
   display: flex;
   flex-direction: column;
+  width: 100%;
+  min-width: 0;
+  height: 100%;
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: 22px;
@@ -33,6 +36,23 @@
   transition: transform 0.7s cubic-bezier(0.2,0.7,0.2,1);
 }
 .rc:hover .rc-img { transform: scale(1.06); }
+
+/* Branded card — same media size as others; crop banner from top */
+.rc-branded .rc-media {
+  aspect-ratio: 4 / 3;
+  background: #1b5e3b;
+}
+.rc-branded .rc-img {
+  object-fit: cover;
+  /* Bias left so the brand logo stays readable in the 4:3 crop */
+  object-position: left 12% top 8%;
+}
+.rc-tag-branded {
+  max-width: calc(100% - 24px);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
 .rc-tag,
 .rc-scan {
@@ -94,6 +114,7 @@
   flex-direction: column;
   gap: 8px;
   flex: 1;
+  min-width: 0;
 }
 .rc-name {
   font-family: var(--font-display);
@@ -102,12 +123,17 @@
   letter-spacing: -0.02em;
   color: var(--ink);
   line-height: 1.15;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .rc-location {
   font-size: 12.5px;
   font-weight: 600;
   color: var(--text-3);
   margin-top: -2px;
+  min-width: 0;
+  max-width: 100%;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -128,9 +154,11 @@
 }
 .rc-cats {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 6px;
   margin-top: 2px;
+  min-width: 0;
+  overflow: hidden;
 }
 .rc-cats span {
   font-size: 11.5px;

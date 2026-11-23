@@ -32,6 +32,12 @@ const IconStar = ({ size = 14 }) => (
 const IconBack = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 18l-6-6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
 );
+const IconChevronLeft = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 18l-6-6 6-6" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+);
+const IconChevronRight = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+);
 const IconClose = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" /></svg>
 );
@@ -74,9 +80,17 @@ const VegMark = ({ tag, size = 14 }) => (
 
 const FoodImage = ({ name, image, fallback }) => {
   const [err, setErr] = useState(false);
+  useEffect(() => { setErr(false); }, [image]);
   const valid = image && (image.startsWith('http') || image.startsWith('blob:') || image.startsWith('data:'));
-  if (err || !valid) return <div className="fi-fallback" aria-hidden="true">{fallback || '🍽️'}</div>;
-  return <img src={image} alt={name} loading="lazy" onError={() => setErr(true)} className="fi-img" />;
+  if (err || !valid) {
+    const letter = (name || '').trim().charAt(0).toUpperCase() || (fallback || '🍽️');
+    return (
+      <div className="fi-fallback fi-fallback-letter" aria-hidden="true" title={name}>
+        {letter}
+      </div>
+    );
+  }
+  return <img src={image} alt={name || ''} loading="lazy" onError={() => setErr(true)} className="fi-img" />;
 };
 
 const SORTERS = {
@@ -141,9 +155,27 @@ export default function MenuPage() {
   const [filterSheetOpen, setFilterSheetOpen] = useState(false);
   const [customRange, setCustomRange] = useState(null);
   const [activeCat, setActiveCat] = useState(null);
+  /** Mobile/tablet: null = category list; id = items for that category */
+  const [mobileCatId, setMobileCatId] = useState(null);
+  const [isCompact, setIsCompact] = useState(() =>
+    typeof window !== 'undefined' ? window.matchMedia('(max-width: 1023px)').matches : false
+  );
   const sectionRefs = useRef({});
   const chipBarRef = useRef(null);
   const chipRefs = useRef({});
+  const picksRowRef = useRef(null);
+  const [picksScroll, setPicksScroll] = useState({ left: false, right: false });
+
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 1023px)');
+    const onChange = () => {
+      setIsCompact(mq.matches);
+      if (!mq.matches) setMobileCatId(null);
+    };
+    onChange();
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, []);
 
   const categories = useMemo(() => restaurant?.categories || [], [restaurant]);
   const allItems = useMemo(
@@ -182,12 +214,25 @@ export default function MenuPage() {
   const filtersActive = (sortBy !== 'default') + (filterTag !== 'all') + (customRange ? 1 : 0);
   const shownCount = sections.reduce((n, s) => n + s.items.length, 0);
   const vegCount = allItems.filter(i => i.tag === 'Veg').length;
-  const picks = !query && !filtersActive ? allItems.filter(i => i.popular).slice(0, 8) : [];
-  const currentCat = activeCat || sections[0]?.id;
+  const showCategoryHome = isCompact && !query && !mobileCatId;
+  const mobileSection = mobileCatId ? sections.find((s) => s.id === mobileCatId) : null;
+  const compactSections = isCompact && !query
+    ? (mobileSection ? [mobileSection] : [])
+    : sections;
+  const picks = !query && !filtersActive && (!isCompact || showCategoryHome)
+    ? allItems.filter(i => i.popular).slice(0, 8)
+    : [];
+  const currentCat = isCompact
+    ? (mobileCatId || activeCat || sections[0]?.id)
+    : (activeCat || sections[0]?.id);
 
-  /* Scroll-spy: highlight the category currently in view */
   useEffect(() => {
-    if (query) return;
+    if (query) setMobileCatId(null);
+  }, [query]);
+
+  /* Scroll-spy: highlight the category currently in view (desktop) */
+  useEffect(() => {
+    if (query || isCompact) return;
     const els = sections.map(s => sectionRefs.current[s.id]).filter(Boolean);
     const obs = new IntersectionObserver(
       entries => entries.forEach(e => e.isIntersecting && setActiveCat(e.target.dataset.cat)),
@@ -195,14 +240,15 @@ export default function MenuPage() {
     );
     els.forEach(el => obs.observe(el));
     return () => obs.disconnect();
-  }, [sections, query]);
+  }, [sections, query, isCompact]);
 
   /* Keep the active chip visible in the mobile chip bar */
   useEffect(() => {
+    if (showCategoryHome) return;
     const bar = chipBarRef.current;
     const chip = chipRefs.current[currentCat];
     if (bar && chip) bar.scrollTo({ left: chip.offsetLeft - bar.clientWidth / 2 + chip.clientWidth / 2, behavior: 'smooth' });
-  }, [currentCat]);
+  }, [currentCat, showCategoryHome]);
 
   /* Lock page scroll + Esc to close while a dish is open */
   useEffect(() => {
@@ -218,7 +264,47 @@ export default function MenuPage() {
 
   const jumpTo = id => {
     setActiveCat(id);
+    if (isCompact) {
+      setMobileCatId(id);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
     sectionRefs.current[id]?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  const backToCategories = () => {
+    setMobileCatId(null);
+    setActiveCat(null);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const updatePicksScroll = () => {
+    const el = picksRowRef.current;
+    if (!el) return;
+    const max = el.scrollWidth - el.clientWidth;
+    setPicksScroll({
+      left: el.scrollLeft > 4,
+      right: max > 4 && el.scrollLeft < max - 4,
+    });
+  };
+
+  useEffect(() => {
+    const el = picksRowRef.current;
+    if (!el) return undefined;
+    updatePicksScroll();
+    el.addEventListener('scroll', updatePicksScroll, { passive: true });
+    window.addEventListener('resize', updatePicksScroll);
+    return () => {
+      el.removeEventListener('scroll', updatePicksScroll);
+      window.removeEventListener('resize', updatePicksScroll);
+    };
+  }, [picks.length]);
+
+  const scrollPicks = (dir) => {
+    const el = picksRowRef.current;
+    if (!el) return;
+    const step = Math.max(220, Math.floor(el.clientWidth * 0.75));
+    el.scrollBy({ left: dir * step, behavior: 'smooth' });
   };
 
   const openItem = item => {
@@ -298,9 +384,20 @@ export default function MenuPage() {
 
   const accent = restaurant.accent || '#f4831f';
   const cover = (restaurant.coverImage || R_IMAGES[restaurant.id] || FALLBACK_IMG).replace('w=600', 'w=1600');
+  const brandedCover = restaurant.id === 'sangeetha-kitchen';
+  /* Keep QR guests on this menu URL — no exit to marketing home */
+  const lockToMenu = restaurant.id === 'sangeetha-kitchen';
   const related = selectedItem
     ? allItems.filter(i => i.categoryId === selectedItem.categoryId && i.id !== selectedItem.id).slice(0, 3)
     : [];
+
+  const onHeaderBack = () => {
+    if (lockToMenu) {
+      if (isCompact && mobileCatId) backToCategories();
+      return;
+    }
+    navigate('/');
+  };
 
   return (
     <div className={`mp${theme === 'dark' ? ' mp-theme-dark' : ''}`} style={{ '--accent': accent }}>
@@ -308,10 +405,21 @@ export default function MenuPage() {
       {/* ── Header ── */}
       <header className="mp-header">
         <div className="mp-header-inner">
-          <button className="mp-icon-btn" onClick={() => navigate('/')} aria-label="Back to home">
-            <IconBack />
-          </button>
-          <img src={toplogo} alt="GetMenuCard" className="mp-header-logo" onClick={() => navigate('/')} />
+          {!(lockToMenu && !(isCompact && mobileCatId)) && (
+            <button
+              className="mp-icon-btn"
+              onClick={onHeaderBack}
+              aria-label={lockToMenu ? 'Back to categories' : 'Back to home'}
+            >
+              <IconBack />
+            </button>
+          )}
+          <img
+            src={toplogo}
+            alt="GetMenuCard"
+            className={`mp-header-logo${lockToMenu ? ' is-static' : ''}`}
+            onClick={lockToMenu ? undefined : () => navigate('/')}
+          />
           <div className="mp-header-name">{restaurant.name}</div>
           <div className="mp-header-actions">
             {isMapsLink(restaurant.location) && (
@@ -340,26 +448,33 @@ export default function MenuPage() {
       </header>
 
       {/* ── Cover ── */}
-      <section className="mp-cover">
-        <img src={cover} alt="" className="mp-cover-img" />
+      <section className={`mp-cover${brandedCover ? ' mp-cover-branded' : ''}`}>
+        <img src={cover} alt={restaurant.name} className="mp-cover-img" />
         <div className="mp-cover-shade" />
         <div className="mp-cover-inner">
-          <span className="mp-cover-badge">{restaurant.emoji} {restaurant.tagline}</span>
-          <h1 className="mp-cover-name">{restaurant.name}</h1>
-          {isMapsLink(restaurant.location) ? (
+          {!brandedCover && (
+            <>
+              <span className="mp-cover-badge">{restaurant.emoji} {restaurant.tagline}</span>
+              <h1 className="mp-cover-name">{restaurant.name}</h1>
+            </>
+          )}
+          {brandedCover && <h1 className="sr-only">{restaurant.name}</h1>}
+          {!brandedCover && (isMapsLink(restaurant.location) ? (
             <button
               type="button"
               className="mp-cover-location"
               onClick={() => window.open(normalizeMapsUrl(restaurant.location), '_blank', 'noopener,noreferrer')}
+              title={restaurant.address || 'Open in Google Maps'}
             >
-              <IconPin size={14} /> Get directions
+              <IconPin size={14} />
+              {restaurant.address?.trim() || 'Get directions'}
             </button>
-          ) : restaurant.location?.trim() ? (
+          ) : (restaurant.address || restaurant.location)?.trim() ? (
             <div className="mp-cover-location">
               <IconPin size={14} />
-              {restaurant.location}
+              {restaurant.address?.trim() || restaurant.location}
             </div>
-          ) : null}
+          ) : null)}
           <div className="mp-cover-meta">
             <span><strong>{allItems.length}</strong> dishes</span>
             <span className="mp-sep" />
@@ -397,7 +512,7 @@ export default function MenuPage() {
           </button>
         </div>
 
-        {!query && sections.length > 0 && (
+        {!query && !showCategoryHome && sections.length > 0 && (
           <div className="mp-chips" ref={chipBarRef}>
             {sections.map(s => (
               <button
@@ -447,10 +562,32 @@ export default function MenuPage() {
           {picks.length > 0 && (
             <section className="mp-picks">
               <div className="mp-picks-head">
-                <h2>Chef’s <em>picks</em></h2>
-                <span>Most loved by guests</span>
+                <div className="mp-picks-head-text">
+                  <h2>Chef’s <em>picks</em></h2>
+                  <span>Most loved by guests</span>
+                </div>
+                <div className="mp-picks-arrows" aria-label="Scroll chef’s picks">
+                  <button
+                    type="button"
+                    className="mp-picks-arrow"
+                    onClick={() => scrollPicks(-1)}
+                    disabled={!picksScroll.left}
+                    aria-label="Previous picks"
+                  >
+                    <IconChevronLeft />
+                  </button>
+                  <button
+                    type="button"
+                    className="mp-picks-arrow"
+                    onClick={() => scrollPicks(1)}
+                    disabled={!picksScroll.right}
+                    aria-label="Next picks"
+                  >
+                    <IconChevronRight />
+                  </button>
+                </div>
               </div>
-              <div className="mp-picks-row">
+              <div className="mp-picks-row" ref={picksRowRef}>
                 {picks.map(item => (
                   <button key={`${item.categoryId}-${item.id}`} className="mp-pick" onClick={() => openItem(item)}>
                     <div className="mp-pick-img">
@@ -465,15 +602,49 @@ export default function MenuPage() {
             </section>
           )}
 
-          {sections.length === 0 ? (
+          {/* Mobile / tablet: category list first */}
+          {showCategoryHome && (
+            <section className="mp-cat-browse" aria-label="Menu categories">
+              <div className="mp-cat-browse-head">
+                <h2>Browse <em>menu</em></h2>
+                <span>{sections.length} categories</span>
+              </div>
+              <ol className="mp-cat-browse-list">
+                {sections.map((s, i) => (
+                  <li key={s.id}>
+                    <button type="button" className="mp-cat-browse-item" onClick={() => jumpTo(s.id)}>
+                      <span className="mp-cat-browse-num">{String(i + 1).padStart(2, '0')}</span>
+                      <span className="mp-cat-browse-body">
+                        <span className="mp-cat-browse-name">{s.name}</span>
+                        <span className="mp-cat-browse-meta">{s.items.length} {s.items.length === 1 ? 'dish' : 'dishes'}</span>
+                      </span>
+                      <span className="mp-cat-browse-chevron" aria-hidden="true">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                      </span>
+                    </button>
+                  </li>
+                ))}
+              </ol>
+            </section>
+          )}
+
+          {isCompact && mobileSection && (
+            <div className="mp-cat-back-bar">
+              <button type="button" className="mp-cat-back" onClick={backToCategories}>
+                <IconBack /> All categories
+              </button>
+            </div>
+          )}
+
+          {!showCategoryHome && sections.length === 0 ? (
             <div className="mp-empty">
               <div className="mp-empty-icon"><IconSearch /></div>
               <div className="mp-empty-title">Nothing matches that</div>
               <p>Try a different dish name or loosen your filters.</p>
               <button className="mp-btn-dark" onClick={clearFilters}>Reset search &amp; filters</button>
             </div>
-          ) : (
-            sections.map((s, idx) => (
+          ) : !showCategoryHome && (
+            (isCompact ? compactSections : sections).map((s, idx) => (
               <section
                 key={s.id}
                 className="mp-section"
@@ -481,7 +652,7 @@ export default function MenuPage() {
                 ref={el => { sectionRefs.current[s.id] = el; }}
               >
                 <div className="mp-section-head">
-                  {!query && <span className="mp-section-num">{String(idx + 1).padStart(2, '0')}</span>}
+                  {!query && <span className="mp-section-num">{String((isCompact ? sections.findIndex((x) => x.id === s.id) : idx) + 1).padStart(2, '0')}</span>}
                   <h2 className="mp-section-title">{s.name}</h2>
                   <span className="mp-section-rule" />
                   <span className="mp-section-count">{s.items.length} {s.items.length === 1 ? 'dish' : 'dishes'}</span>
@@ -535,10 +706,21 @@ export default function MenuPage() {
           </section>
 
           <footer className="mp-powered">
-            <button type="button" className="mp-powered-brand" onClick={() => navigate('/')}>
-              <img src={toplogo} alt="GetMenuCard" />
-            </button>
-            Digital menu by <button type="button" onClick={() => navigate('/')}>GetMenuCard</button>
+            {lockToMenu ? (
+              <>
+                <span className="mp-powered-brand is-static">
+                  <img src={toplogo} alt="GetMenuCard" />
+                </span>
+                Digital menu by <span>GetMenuCard</span>
+              </>
+            ) : (
+              <>
+                <button type="button" className="mp-powered-brand" onClick={() => navigate('/')}>
+                  <img src={toplogo} alt="GetMenuCard" />
+                </button>
+                Digital menu by <button type="button" onClick={() => navigate('/')}>GetMenuCard</button>
+              </>
+            )}
           </footer>
         </main>
       </div>
