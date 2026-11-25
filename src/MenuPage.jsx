@@ -12,6 +12,7 @@ import {
   normalizeMapsUrl,
 } from './restaurantStore';
 import FilterSheet from './FilterSheet';
+import { resolveMenuImage } from './menuImages';
 import './MenuPage.css';
 
 /* ── Icons ── */
@@ -78,11 +79,23 @@ const VegMark = ({ tag, size = 14 }) => (
   />
 );
 
+const isUsableImageSrc = (src) => {
+  if (!src || typeof src !== 'string') return false;
+  return (
+    src.startsWith('http')
+    || src.startsWith('blob:')
+    || src.startsWith('data:')
+    || src.startsWith('/')
+    || src.startsWith('.')
+  );
+};
+
 const FoodImage = ({ name, image, fallback }) => {
+  const local = resolveMenuImage(name);
+  const src = local || image;
   const [err, setErr] = useState(false);
-  useEffect(() => { setErr(false); }, [image]);
-  const valid = image && (image.startsWith('http') || image.startsWith('blob:') || image.startsWith('data:'));
-  if (err || !valid) {
+  useEffect(() => { setErr(false); }, [src]);
+  if (err || !isUsableImageSrc(src)) {
     const letter = (name || '').trim().charAt(0).toUpperCase() || (fallback || '🍽️');
     return (
       <div className="fi-fallback fi-fallback-letter" aria-hidden="true" title={name}>
@@ -90,7 +103,7 @@ const FoodImage = ({ name, image, fallback }) => {
       </div>
     );
   }
-  return <img src={image} alt={name || ''} loading="lazy" onError={() => setErr(true)} className="fi-img" />;
+  return <img src={src} alt={name || ''} loading="lazy" onError={() => setErr(true)} className="fi-img" />;
 };
 
 const SORTERS = {
